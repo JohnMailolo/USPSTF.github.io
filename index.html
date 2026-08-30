@@ -32,6 +32,8 @@
   .empty { color: #7a8896; font-style: italic; padding: 20px 0; }
   .note { font-size: .78rem; color: #7a8896; margin-top: 18px; line-height: 1.4; }
   button.reset { background: #eef2f5; border: 1px solid #c3ced9; border-radius: 6px; padding: 8px 14px; font-size: .85rem; cursor: pointer; margin-top: 14px; }
+  .V { background: #35618e; }
+  .gborder-V { border-left-color: #35618e; }
 </style>
 </head>
 <body>
@@ -74,6 +76,9 @@
         <label><input type="checkbox" id="reproductive"> Reproductive-age / planning pregnancy</label>
         <label><input type="checkbox" id="osteo_risk"> Postmenopausal &lt;65 w/ ↑fracture risk</label>
         <label><input type="checkbox" id="fhx_aaa"> No AAA family hx (women)</label>
+        <label><input type="checkbox" id="immunocomp"> Immunocompromised / asplenia</label>
+        <label><input type="checkbox" id="chronic_cond"> Chronic heart/lung/liver dz, diabetes, alcohol/smoking</label>
+        <label><input type="checkbox" id="no_immunity"> No evidence of vaccine immunity</label>
       </div>
     </fieldset>
     <button class="reset" onclick="resetAll()">Reset</button>
@@ -177,9 +182,34 @@ const RECS = [
     m:p=>p.sex==="female" && p.age>=65},
   {cat:"Reproductive / women's health", t:"Osteoporosis screening (DXA)", g:"B", crit:"Postmenopausal women <65 at increased risk", mgmt:"DXA after risk assessment tool (ORAI/FRAX).",
     m:p=>p.sex==="female" && p.age<65 && p.osteo_risk},
+ 
+  // ---- Immunizations (ACIP/CDC, not USPSTF) ----
+  // Adult schedule (ages 19+)
+  {cat:"Immunizations", t:"Influenza vaccine", g:"V", crit:"Everyone age ≥6 months", mgmt:"1 dose annually. Age ≥65: prefer high-dose, adjuvanted, or recombinant.",
+    m:p=>p.age>=0.5},
+  {cat:"Immunizations", t:"COVID-19 vaccine", g:"V", crit:"Everyone age ≥6 months", mgmt:"Per current ACIP recommendation for age/product; dosing depends on prior vaccination.",
+    m:p=>p.age>=0.5},
+  {cat:"Immunizations", t:"Tdap / Td booster", g:"V", crit:"All adults", mgmt:"1-time Tdap if not previously received, then Td or Tdap every 10 years; Tdap with each wound if >5y since last dose.",
+    m:p=>p.age>=19},
+  {cat:"Immunizations", t:"Tdap in pregnancy", g:"V", crit:"Every pregnancy", mgmt:"1 dose Tdap at 27–36 weeks' gestation.",
+    m:p=>p.pregnant},
+  {cat:"Immunizations", t:"Recombinant zoster vaccine (Shingrix)", g:"V", crit:"All adults ≥50 (and ≥19 if immunocompromised)", mgmt:"2-dose series 2–6 months apart (1–2 months if immunocompromised).",
+    m:p=>p.age>=50 || (p.age>=19 && p.immunocomp)},
+  {cat:"Immunizations", t:"Pneumococcal vaccine", g:"V", crit:"All adults ≥65; ages 19–64 with chronic/high-risk conditions or immunocompromise", mgmt:"1 dose PCV20 (or PCV15 + PPSV23 ≥1y later, or ≥8 wks if immunocompromised).",
+    m:p=>p.age>=65 || (p.age>=19 && (p.chronic_cond||p.immunocomp||p.smoke_current))},
+  {cat:"Immunizations", t:"RSV vaccine", g:"V", crit:"All adults ≥75; ages 60–74 at increased risk", mgmt:"Single dose (not annual). 60–74: shared clinical decision-making.",
+    m:p=>p.age>=60},
+  {cat:"Immunizations", t:"Hepatitis B vaccine", g:"V", crit:"All adults 19–59; ≥60 with risk factors (may give ≥60 without)", mgmt:"2-dose (Heplisav-B) or 3-dose (Engerix-B/Recombivax) series.",
+    m:p=>(p.age>=19 && p.age<=59) || (p.age>=60 && (p.chronic_cond||p.sexrisk||p.immunocomp))},
+  {cat:"Immunizations", t:"HPV vaccine", g:"V", crit:"Routine through age 26 if not vaccinated", mgmt:"Ages 9–14: 2-dose series; ages 15–26: 3-dose series.",
+    m:p=>p.age>=9 && p.age<=26},
+  {cat:"Immunizations", t:"HPV vaccine — shared decision", g:"V", crit:"Ages 27–45, not adequately vaccinated", mgmt:"Shared clinical decision-making; 3-dose series if given.",
+    m:p=>p.age>=27 && p.age<=45},
+  {cat:"Immunizations", t:"MMR vaccine", g:"V", crit:"Adults born ≥1957 without evidence of immunity", mgmt:"1 dose (2 doses ≥28 days apart if high risk); nonimmune reproductive-age women postpartum.",
+    m:p=>p.age>=19 && p.no_immunity}
 ];
 
-const ids = ["smoke_current","smoke_former","smoke_ever","packyears20","cvdrisk","sexrisk","prep","pregnant","preg_high","reproductive","osteo_risk","fhx_aaa"];
+const ids = ["smoke_current","smoke_former","smoke_ever","packyears20","cvdrisk","sexrisk","prep","pregnant","preg_high","reproductive","osteo_risk","fhx_aaa","immunocomp","chronic_cond","no_immunity"];
 
 function getParams(){
   const p = {
