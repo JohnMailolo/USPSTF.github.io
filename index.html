@@ -78,7 +78,7 @@
         <label><input type="checkbox" id="fhx_aaa"> No AAA family hx (women)</label>
         <label><input type="checkbox" id="immunocomp"> Immunocompromised / asplenia</label>
         <label><input type="checkbox" id="chronic_cond"> Chronic heart/lung/liver dz, diabetes, alcohol/smoking</label>
-        <label><input type="checkbox" id="no_immunity"> No evidence of vaccine immunity</label>
+        <label><input type="checkbox" id="no_immunity"> No evidence of MMR vaccine immunity</label>
       </div>
     </fieldset>
     <button class="reset" onclick="resetAll()">Reset</button>
@@ -206,10 +206,10 @@ const RECS = [
   {cat:"Immunizations", t:"HPV vaccine — shared decision", g:"V", crit:"Ages 27–45, not adequately vaccinated", mgmt:"Shared clinical decision-making; 3-dose series if given.",
     m:p=>p.age>=27 && p.age<=45},
   {cat:"Immunizations", t:"MMR vaccine", g:"V", crit:"Adults born ≥1957 without evidence of immunity", mgmt:"1 dose (2 doses ≥28 days apart if high risk); nonimmune reproductive-age women postpartum.",
-    m:p=>p.age>=19 && p.no_immunity}
+    m:p=>p.age>=19 && p.no_immunity_MMR}
 ];
 
-const ids = ["smoke_current","smoke_former","smoke_ever","packyears20","cvdrisk","sexrisk","prep","pregnant","preg_high","reproductive","osteo_risk","fhx_aaa","immunocomp","chronic_cond","no_immunity"];
+const ids = ["smoke_current","smoke_former","smoke_ever","packyears20","cvdrisk","sexrisk","prep","pregnant","preg_high","reproductive","osteo_risk","fhx_aaa","immunocomp","chronic_cond","no_immunity_MMR"];
 
 function getParams(){
   const p = {
