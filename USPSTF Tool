@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USPSTF Preventive Care Tool</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; background: #f4f6f8; color: #1a2330; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .sub { color: #5a6a7a; font-size: .85rem; margin-bottom: 18px; }
+  .panel { background: #fff; border: 1px solid #dce3ea; border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+  label { display: block; font-size: .78rem; font-weight: 600; color: #33475b; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .02em; }
+  select, input[type=number] { width: 100%; padding: 8px 10px; border: 1px solid #c3ced9; border-radius: 6px; font-size: .95rem; background: #fff; }
+  fieldset { border: 1px solid #dce3ea; border-radius: 8px; margin: 16px 0 0; padding: 12px 14px; }
+  legend { font-size: .78rem; font-weight: 700; color: #33475b; padding: 0 6px; text-transform: uppercase; }
+  .checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px 18px; }
+  .checks label { display: flex; align-items: center; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: .9rem; margin: 0; cursor: pointer; }
+  .checks input { margin-right: 8px; }
+  .count { font-size: .85rem; color: #5a6a7a; margin: 6px 0 12px; }
+  .rec { border: 1px solid #dce3ea; border-left-width: 5px; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; background: #fff; }
+  .rec h3 { margin: 0 0 4px; font-size: 1rem; }
+  .rec .crit { font-size: .85rem; color: #46586a; margin: 2px 0; }
+  .rec .mgmt { font-size: .9rem; margin: 6px 0 0; }
+  .badge { display: inline-block; font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; color: #fff; margin-left: 6px; vertical-align: middle; }
+  .A { background: #1b7f43; } .B { background: #2e8b57; }
+  .C { background: #c98a00; } .D { background: #b23b3b; } .I { background: #6b7684; }
+  .gborder-A { border-left-color: #1b7f43; } .gborder-B { border-left-color: #2e8b57; }
+  .gborder-C { border-left-color: #c98a00; } .gborder-D { border-left-color: #b23b3b; } .gborder-I { border-left-color: #6b7684; }
+  .cat { font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; color: #7a8896; font-weight: 700; margin: 18px 0 8px; border-bottom: 1px solid #e3e9ee; padding-bottom: 4px; }
+  .empty { color: #7a8896; font-style: italic; padding: 20px 0; }
+  .note { font-size: .78rem; color: #7a8896; margin-top: 18px; line-height: 1.4; }
+  button.reset { background: #eef2f5; border: 1px solid #c3ced9; border-radius: 6px; padding: 8px 14px; font-size: .85rem; cursor: pointer; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>USPSTF Preventive Care Tool</h1>
+  <div class="sub">Enter patient parameters to auto-filter applicable USPSTF recommendations. Grade A/B = offer routinely; C = shared decision-making; D = recommend against. Not a substitute for the current uspstf.org list.</div>
+
+  <div class="panel">
+    <div class="grid">
+      <div>
+        <label for="age">Age (years)</label>
+        <input type="number" id="age" min="0" max="120" placeholder="e.g. 58">
+      </div>
+      <div>
+        <label for="sex">Sex / anatomy</label>
+        <select id="sex">
+          <option value="">— select —</option>
+          <option value="female">Female / has cervix+breasts</option>
+          <option value="male">Male</option>
+        </select>
+      </div>
+      <div>
+        <label for="bmi">BMI (kg/m²)</label>
+        <input type="number" id="bmi" min="10" max="70" step="0.1" placeholder="e.g. 27">
+      </div>
+    </div>
+
+    <fieldset>
+      <legend>Social &amp; risk history</legend>
+      <div class="checks">
+        <label><input type="checkbox" id="smoke_current"> Current smoker</label>
+        <label><input type="checkbox" id="smoke_former"> Former smoker (quit &lt;15y)</label>
+        <label><input type="checkbox" id="smoke_ever"> Ever smoked (any)</label>
+        <label><input type="checkbox" id="packyears20"> ≥20 pack-years</label>
+        <label><input type="checkbox" id="cvdrisk"> ≥1 CVD risk factor / ASCVD ≥10%</label>
+        <label><input type="checkbox" id="sexrisk"> Increased STI/HIV risk</label>
+        <label><input type="checkbox" id="prep"> Candidate for HIV PrEP</label>
+        <label><input type="checkbox" id="pregnant"> Currently pregnant</label>
+        <label><input type="checkbox" id="preg_high"> Pregnant, high preeclampsia risk</label>
+        <label><input type="checkbox" id="reproductive"> Reproductive-age / planning pregnancy</label>
+        <label><input type="checkbox" id="osteo_risk"> Postmenopausal &lt;65 w/ ↑fracture risk</label>
+        <label><input type="checkbox" id="fhx_aaa"> No AAA family hx (women)</label>
+      </div>
+    </fieldset>
+    <button class="reset" onclick="resetAll()">Reset</button>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div id="results"></div>
+
+  <div class="note">
+    Grades reflect net benefit. Overlapping triggers are intentional — read every section the patient qualifies for. Shared-decision items (Grade C) should be documented. This static tool mirrors published USPSTF recommendation statements and should be verified against the continuously updated list at uspstf.org. Sources: USPSTF recommendation statements for colorectal (2021), cervical (2018), breast (2024), lung (2021), prostate (2018), hypertension, diabetes (2021), statin use (2022), AAA (2019), HIV/HCV/STI, tobacco (2021), alcohol (2018), aspirin for preeclampsia (2021), and osteoporosis (2025).
+  </div>
+</div>
+
+<script>
+// Each rec: category, title, grade, criteria text, management text, and a match(p) function.
+const RECS = [
+  // Universal
+  {cat:"Universal", t:"Hypertension screening", g:"A", crit:"All adults ≥18", mgmt:"Office BP; confirm with out-of-office (ambulatory/home) BP before diagnosis.",
+    m:p=>p.age>=18},
+  {cat:"Universal", t:"Depression screening", g:"B", crit:"Adults incl. pregnant/postpartum; adolescents 12–18", mgmt:"Screen with systems for diagnosis, treatment, follow-up (e.g. PHQ-9/PHQ-A).",
+    m:p=>p.age>=12},
+  {cat:"Universal", t:"Unhealthy alcohol use screening", g:"B", crit:"Adults ≥18", mgmt:"AUDIT-C / SASQ + brief behavioral counseling for risky use.",
+    m:p=>p.age>=18},
+  {cat:"Universal", t:"Unhealthy drug use screening", g:"B", crit:"Adults ≥18 (when treatment/referral available)", mgmt:"Screen by asking about use; refer as needed.",
+    m:p=>p.age>=18},
+  {cat:"Universal", t:"Tobacco cessation", g:"A", crit:"All adults", mgmt:"Ask/advise; behavioral counseling + pharmacotherapy (NRT, bupropion SR, varenicline). Pregnant: behavioral counseling.",
+    m:p=>p.age>=18 && (p.smoke_current||p.smoke_former||p.smoke_ever)},
+  {cat:"Universal", t:"HIV screening", g:"A", crit:"Adolescents/adults 15–65 (others at risk); all pregnant", mgmt:"Screen at least once; repeat if ongoing risk.",
+    m:p=>(p.age>=15 && p.age<=65)||p.sexrisk||p.pregnant},
+  {cat:"Universal", t:"Hepatitis C screening", g:"B", crit:"Adults 18–79", mgmt:"Screen once; more often if ongoing risk.",
+    m:p=>p.age>=18 && p.age<=79},
+
+  // Cancer — colorectal
+  {cat:"Cancer screening", t:"Colorectal cancer screening", g:"B", crit:"Average-risk adults 45–49", mgmt:"Colonoscopy q10y, FIT annually, stool-DNA q1–3y, CTC/flex sig q5y.",
+    m:p=>p.age>=45 && p.age<=49},
+  {cat:"Cancer screening", t:"Colorectal cancer screening", g:"A", crit:"Average-risk adults 50–75", mgmt:"Colonoscopy q10y, FIT annually, stool-DNA q1–3y, CTC/flex sig q5y; positive non-colonoscopy test → colonoscopy.",
+    m:p=>p.age>=50 && p.age<=75},
+  {cat:"Cancer screening", t:"Colorectal cancer screening", g:"C", crit:"Adults 76–85 with prior screening", mgmt:"Selectively offer based on health, prior screening, preference (shared decision).",
+    m:p=>p.age>=76 && p.age<=85},
+
+  // Cervical
+  {cat:"Cancer screening", t:"Cervical cancer screening", g:"A", crit:"Women 21–29", mgmt:"Cytology alone every 3 years.",
+    m:p=>p.sex==="female" && p.age>=21 && p.age<=29},
+  {cat:"Cancer screening", t:"Cervical cancer screening", g:"A", crit:"Women 30–65", mgmt:"Cytology q3y, OR hrHPV q5y, OR co-testing q5y.",
+    m:p=>p.sex==="female" && p.age>=30 && p.age<=65},
+  {cat:"Cancer screening", t:"Cervical cancer screening — do NOT screen", g:"D", crit:"Age <21, or >65 with adequate prior screening", mgmt:"Do not screen (also stop after benign hysterectomy).",
+    m:p=>p.sex==="female" && (p.age<21 || p.age>65)},
+
+  // Breast
+  {cat:"Cancer screening", t:"Breast cancer screening", g:"B", crit:"Women 40–74, average risk", mgmt:"Biennial mammography.",
+    m:p=>p.sex==="female" && p.age>=40 && p.age<=74},
+
+  // Lung
+  {cat:"Cancer screening", t:"Lung cancer screening (LDCT)", g:"B", crit:"Age 50–80, ≥20 pack-years, current or quit <15y", mgmt:"Annual low-dose CT; stop after 15y abstinence or limited life expectancy.",
+    m:p=>p.age>=50 && p.age<=80 && p.packyears20 && (p.smoke_current||p.smoke_former)},
+
+  // Prostate
+  {cat:"Cancer screening", t:"Prostate cancer (PSA)", g:"C", crit:"Men 55–69", mgmt:"Individualized PSA after benefit/harm discussion (shared decision).",
+    m:p=>p.sex==="male" && p.age>=55 && p.age<=69},
+  {cat:"Cancer screening", t:"Prostate cancer — do NOT screen", g:"D", crit:"Men ≥70", mgmt:"Do not screen routinely.",
+    m:p=>p.sex==="male" && p.age>=70},
+
+  // Cardiometabolic
+  {cat:"Cardiometabolic", t:"Prediabetes / type 2 diabetes screening", g:"B", crit:"Adults 35–70 with overweight/obesity (BMI ≥25)", mgmt:"A1c, FPG, or OGTT; refer prediabetes to preventive intervention.",
+    m:p=>p.age>=35 && p.age<=70 && p.bmi>=25},
+  {cat:"Cardiometabolic", t:"Statin for primary prevention", g:"B", crit:"Adults 40–75 with ≥1 CVD risk factor and 10y ASCVD ≥10%", mgmt:"Prescribe a statin.",
+    m:p=>p.age>=40 && p.age<=75 && p.cvdrisk},
+  {cat:"Cardiometabolic", t:"Diet/physical activity counseling", g:"B", crit:"Adults with CVD risk factors", mgmt:"Offer or refer to intensive behavioral counseling.",
+    m:p=>p.age>=18 && p.cvdrisk},
+  {cat:"Cardiometabolic", t:"Obesity — behavioral intervention", g:"B", crit:"Adults BMI ≥30", mgmt:"Refer to intensive, multicomponent behavioral intervention.",
+    m:p=>p.age>=18 && p.bmi>=30},
+  {cat:"Cardiometabolic", t:"AAA one-time ultrasound", g:"B", crit:"Men 65–75 who ever smoked", mgmt:"One-time screening abdominal ultrasound.",
+    m:p=>p.sex==="male" && p.age>=65 && p.age<=75 && p.smoke_ever},
+  {cat:"Cardiometabolic", t:"AAA screening — selective", g:"C", crit:"Men 65–75 who never smoked", mgmt:"Selectively offer based on risk/preference.",
+    m:p=>p.sex==="male" && p.age>=65 && p.age<=75 && !p.smoke_ever},
+  {cat:"Cardiometabolic", t:"AAA screening — do NOT screen", g:"D", crit:"Women who never smoked, no family hx", mgmt:"Do not screen.",
+    m:p=>p.sex==="female" && p.age>=65 && p.age<=75 && !p.smoke_ever && p.fhx_aaa},
+
+  // Infectious / sexual health
+  {cat:"Infectious / sexual health", t:"Chlamydia & gonorrhea screening", g:"B", crit:"Sexually active women ≤24, or older at increased risk", mgmt:"NAAT screening.",
+    m:p=>p.sex==="female" && ((p.age>=15 && p.age<=24)||p.sexrisk)},
+  {cat:"Infectious / sexual health", t:"Syphilis screening", g:"A", crit:"Nonpregnant adults/adolescents at increased risk; all pregnant", mgmt:"Serologic screening.",
+    m:p=>p.sexrisk||p.pregnant},
+  {cat:"Infectious / sexual health", t:"Hepatitis B screening", g:"B", crit:"Adolescents/adults at increased risk; all pregnant", mgmt:"Screen at-risk persons and all pregnant patients.",
+    m:p=>p.sexrisk||p.pregnant},
+  {cat:"Infectious / sexual health", t:"Latent TB screening", g:"B", crit:"Populations at increased risk", mgmt:"IGRA or TST.",
+    m:p=>p.sexrisk},
+  {cat:"Infectious / sexual health", t:"HIV PrEP", g:"A", crit:"Persons at increased HIV risk", mgmt:"Offer effective antiretroviral PrEP.",
+    m:p=>p.prep},
+  {cat:"Infectious / sexual health", t:"Genital herpes serology — do NOT screen", g:"D", crit:"Asymptomatic adolescents/adults", mgmt:"Do not perform routine serologic HSV screening.",
+    m:p=>p.sexrisk},
+
+  // Reproductive / women's health
+  {cat:"Reproductive / women's health", t:"Intimate partner violence screening", g:"B", crit:"Women of reproductive age", mgmt:"Screen; refer positives to support services.",
+    m:p=>p.sex==="female" && p.age>=15 && p.age<=50},
+  {cat:"Reproductive / women's health", t:"Folic acid supplementation", g:"A", crit:"Persons planning or capable of pregnancy", mgmt:"0.4–0.8 mg folic acid daily.",
+    m:p=>p.reproductive},
+  {cat:"Reproductive / women's health", t:"Low-dose aspirin for preeclampsia", g:"B", crit:"Pregnant persons at high risk", mgmt:"Aspirin 81 mg/day, start 12–28 wks (ideally <16 wks).",
+    m:p=>p.preg_high},
+  {cat:"Reproductive / women's health", t:"Osteoporosis screening (DXA)", g:"B", crit:"Women ≥65", mgmt:"DXA screening.",
+    m:p=>p.sex==="female" && p.age>=65},
+  {cat:"Reproductive / women's health", t:"Osteoporosis screening (DXA)", g:"B", crit:"Postmenopausal women <65 at increased risk", mgmt:"DXA after risk assessment tool (ORAI/FRAX).",
+    m:p=>p.sex==="female" && p.age<65 && p.osteo_risk},
+];
+
+const ids = ["smoke_current","smoke_former","smoke_ever","packyears20","cvdrisk","sexrisk","prep","pregnant","preg_high","reproductive","osteo_risk","fhx_aaa"];
+
+function getParams(){
+  const p = {
+    age: parseFloat(document.getElementById("age").value),
+    sex: document.getElementById("sex").value,
+    bmi: parseFloat(document.getElementById("bmi").value),
+  };
+  if(isNaN(p.age)) p.age = -1;
+  if(isNaN(p.bmi)) p.bmi = -1;
+  ids.forEach(i=>p[i]=document.getElementById(i).checked);
+  return p;
+}
+
+function render(){
+  const p = getParams();
+  const res = document.getElementById("results");
+  const count = document.getElementById("count");
+  if(p.age<0 && !p.sex){
+    res.innerHTML='<div class="empty">Enter at least age and sex to see recommendations.</div>';
+    count.textContent="";
+    return;
+  }
+  const matched = RECS.filter(r=>{ try{return r.m(p);}catch(e){return false;} });
+  count.textContent = matched.length + " applicable recommendation" + (matched.length===1?"":"s");
+  if(matched.length===0){ res.innerHTML='<div class="empty">No recommendations match the current parameters.</div>'; return; }
+  const cats = [...new Set(matched.map(r=>r.cat))];
+  let html="";
+  cats.forEach(c=>{
+    html += '<div class="cat">'+c+'</div>';
+    matched.filter(r=>r.cat===c).forEach(r=>{
+      html += '<div class="rec gborder-'+r.g+'">'
+        + '<h3>'+r.t+' <span class="badge '+r.g+'">Grade '+r.g+'</span></h3>'
+        + '<div class="crit">'+r.crit+'</div>'
+        + '<div class="mgmt">'+r.mgmt+'</div></div>';
+    });
+  });
+  res.innerHTML=html;
+}
+
+function resetAll(){
+  document.getElementById("age").value="";
+  document.getElementById("bmi").value="";
+  document.getElementById("sex").value="";
+  ids.forEach(i=>document.getElementById(i).checked=false);
+  render();
+}
+
+document.querySelectorAll("input,select").forEach(el=>{
+  el.addEventListener("input", render);
+  el.addEventListener("change", render);
+});
+render();
+</script>
+</body>
+</html>
